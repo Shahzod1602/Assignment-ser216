@@ -1,0 +1,75 @@
+@startuml Banking System - Sequence Diagram (Fund Transfer)
+
+title Banking System - Fund Transfer Process
+
+skinparam sequence {
+    ArrowColor #1565C0
+    ActorBorderColor #2E7D32
+    LifeLineBorderColor #0D47A1
+    ParticipantBackgroundColor #E3F2FD
+    ParticipantBorderColor #1565C0
+}
+
+actor "Customer" as customer
+participant "Web/Mobile App" as app
+participant "Auth Service" as auth
+participant "Transfer Service" as transfer
+participant "Account Service" as account
+database "Database" as db
+participant "Notification Service" as notif
+
+== Authentication Phase ==
+
+customer -> app : Open Transfer Page
+app -> auth : Request Authentication
+auth -> customer : Prompt for Credentials
+customer -> auth : Enter Username & Password
+auth -> db : Validate Credentials
+db --> auth : Credentials Valid
+auth --> app : Authentication Token
+
+== Transfer Initiation Phase ==
+
+customer -> app : Enter Transfer Details\n(recipient, amount, description)
+app -> transfer : Initiate Transfer Request
+
+== Validation Phase ==
+
+transfer -> account : Check Sender Account Balance
+account -> db : Query Account Balance
+db --> account : Return Balance
+account --> transfer : Balance: $5,000
+
+alt Sufficient Funds
+    transfer -> account : Verify Recipient Account
+    account -> db : Query Recipient Account
+    db --> account : Account Found & Active
+    account --> transfer : Recipient Verified
+
+    == Execution Phase ==
+
+    transfer -> account : Debit Sender Account ($500)
+    account -> db : UPDATE sender balance
+    db --> account : Balance Updated
+
+    transfer -> account : Credit Recipient Account ($500)
+    account -> db : UPDATE recipient balance
+    db --> account : Balance Updated
+
+    transfer -> db : Record Transaction Log
+    db --> transfer : Transaction Recorded
+
+    == Confirmation Phase ==
+
+    transfer --> app : Transfer Successful
+    app --> customer : Show Success Confirmation\n& Transaction Receipt
+
+    transfer -> notif : Send Transfer Notification
+    notif -> customer : Email/SMS Confirmation\n"$500 sent to John Doe"
+
+else Insufficient Funds
+    transfer --> app : Transfer Failed:\n"Insufficient Balance"
+    app --> customer : Show Error Message
+end
+
+@enduml

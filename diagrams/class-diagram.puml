@@ -1,0 +1,153 @@
+@startuml Banking System - Class Diagram
+
+title Banking System - Class Diagram
+
+skinparam class {
+    BackgroundColor #E3F2FD
+    BorderColor #1565C0
+    ArrowColor #0D47A1
+}
+skinparam stereotypeCBackgroundColor #BBDEFB
+
+' ===== ABSTRACT CLASS: User =====
+abstract class User {
+    - userId : int
+    - firstName : String
+    - lastName : String
+    - email : String
+    - phone : String
+    - passwordHash : String
+    + login() : boolean
+    + logout() : void
+    + updateProfile() : void
+}
+
+' ===== CLASS: Customer =====
+class Customer {
+    - customerId : int
+    - address : String
+    - dateOfBirth : Date
+    - nationalId : String
+    + openAccount() : Account
+    + applyForLoan() : Loan
+    + viewAccounts() : List<Account>
+}
+
+' ===== CLASS: BankTeller =====
+class BankTeller {
+    - employeeId : int
+    - branch : String
+    + processTransaction() : void
+    + verifyIdentity(customer: Customer) : boolean
+}
+
+' ===== CLASS: Admin =====
+class Admin {
+    - adminLevel : int
+    + manageAccounts() : void
+    + generateReport() : Report
+    + manageUsers() : void
+}
+
+' ===== ABSTRACT CLASS: Account =====
+abstract class Account {
+    - accountId : int
+    - accountNumber : String
+    - balance : double
+    - dateOpened : Date
+    - status : String
+    + deposit(amount: double) : void
+    + withdraw(amount: double) : boolean
+    + getBalance() : double
+    + getTransactionHistory() : List<Transaction>
+}
+
+' ===== CLASS: SavingsAccount =====
+class SavingsAccount {
+    - interestRate : double
+    - minimumBalance : double
+    + calculateInterest() : double
+}
+
+' ===== CLASS: CheckingAccount =====
+class CheckingAccount {
+    - overdraftLimit : double
+    + processCheck() : void
+}
+
+' ===== CLASS: Transaction =====
+class Transaction {
+    - transactionId : int
+    - type : String
+    - amount : double
+    - date : Date
+    - description : String
+    - status : String
+    + execute() : boolean
+    + cancel() : boolean
+    + getReceipt() : String
+}
+
+' ===== CLASS: Transfer =====
+class Transfer {
+    - transferId : int
+    - fromAccount : Account
+    - toAccount : Account
+    - amount : double
+    - date : Date
+    + execute() : boolean
+    + validate() : boolean
+}
+
+' ===== CLASS: Loan =====
+class Loan {
+    - loanId : int
+    - amount : double
+    - interestRate : double
+    - termMonths : int
+    - status : String
+    - startDate : Date
+    + approve() : void
+    + reject() : void
+    + calculateMonthlyPayment() : double
+}
+
+' ===== CLASS: Notification =====
+class Notification {
+    - notificationId : int
+    - message : String
+    - type : String
+    - date : Date
+    - isRead : boolean
+    + send() : void
+    + markAsRead() : void
+}
+
+' ===== CLASS: Branch =====
+class Branch {
+    - branchId : int
+    - name : String
+    - address : String
+    - phone : String
+    + getEmployees() : List<BankTeller>
+    + getAccounts() : List<Account>
+}
+
+' ===== INHERITANCE =====
+User <|-- Customer
+User <|-- BankTeller
+User <|-- Admin
+Account <|-- SavingsAccount
+Account <|-- CheckingAccount
+
+' ===== ASSOCIATIONS =====
+Customer "1" -- "1..*" Account : owns >
+Account "1" -- "0..*" Transaction : records >
+Customer "1" -- "0..*" Loan : applies for >
+Customer "1" -- "0..*" Notification : receives >
+Transfer "1" --> "1" Account : from
+Transfer "1" --> "1" Account : to
+BankTeller "0..*" -- "1" Branch : works at >
+Branch "1" -- "0..*" Account : manages >
+
+@enduml

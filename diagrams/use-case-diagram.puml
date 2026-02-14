@@ -1,0 +1,81 @@
+@startuml Banking System - Use Case Diagram
+
+title Banking System - Use Case Diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor #E8F5E9
+    BorderColor #2E7D32
+    ArrowColor #1B5E20
+}
+
+' ===== ACTORS =====
+actor "Customer" as customer
+actor "Bank Teller" as teller
+actor "Admin" as admin
+actor "ATM Machine" as atm
+
+' ===== SYSTEM BOUNDARY =====
+rectangle "Banking System" {
+
+    ' --- Customer Use Cases ---
+    usecase "Open Account" as UC1
+    usecase "Deposit Money" as UC2
+    usecase "Withdraw Money" as UC3
+    usecase "Transfer Funds" as UC4
+    usecase "View Account Balance" as UC5
+    usecase "View Transaction History" as UC6
+    usecase "Apply for Loan" as UC7
+
+    ' --- Teller Use Cases ---
+    usecase "Process Transactions" as UC8
+    usecase "Verify Customer Identity" as UC9
+
+    ' --- Admin Use Cases ---
+    usecase "Manage Accounts" as UC10
+    usecase "Generate Reports" as UC11
+    usecase "Manage Users" as UC12
+
+    ' --- Shared / System Use Cases ---
+    usecase "Authenticate User" as UC13
+    usecase "Send Notification" as UC14
+}
+
+' ===== RELATIONSHIPS: Customer =====
+customer --> UC1
+customer --> UC2
+customer --> UC3
+customer --> UC4
+customer --> UC5
+customer --> UC6
+customer --> UC7
+
+' ===== RELATIONSHIPS: Bank Teller =====
+teller --> UC8
+teller --> UC9
+teller --> UC2
+teller --> UC3
+
+' ===== RELATIONSHIPS: Admin =====
+admin --> UC10
+admin --> UC11
+admin --> UC12
+
+' ===== RELATIONSHIPS: ATM =====
+atm --> UC2
+atm --> UC3
+atm --> UC5
+
+' ===== INCLUDE relationships =====
+UC2 ..> UC13 : <<include>>
+UC3 ..> UC13 : <<include>>
+UC4 ..> UC13 : <<include>>
+UC4 ..> UC14 : <<include>>
+UC7 ..> UC9 : <<include>>
+
+' ===== EXTEND relationships =====
+UC6 ..> UC5 : <<extend>>
+
+@enduml
